@@ -29,13 +29,14 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
-
-
   @override
   _MyHomePageState createState() => new _MyHomePageState();
+
 }
 
+
 class _MyHomePageState extends State<MyHomePage> {
+  BuildContext _scaffoldContext;
   List<Drink> data;
   void addConsumption() {
     Navigator.push(
@@ -49,8 +50,10 @@ class _MyHomePageState extends State<MyHomePage> {
    print("import");
    Navigator.push(
      context,
-     new MaterialPageRoute(builder: (context) => new Import()),
+     new MaterialPageRoute(builder: (context) => new Import(_scaffoldContext)),
    );
+//   Scaffold.of(_scaffoldContext).showSnackBar(new SnackBar(
+//       content: new Text('Server error')));
   }
 
   void exportData() {
@@ -202,6 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: new FutureBuilder<List<Drink>>(
         future: getFromDb(),
         builder: (BuildContext context, AsyncSnapshot<List<Drink>> snapshot) {
+          this._scaffoldContext = context;
           switch (snapshot.connectionState) {
             case ConnectionState.none:
               return new ListView(
