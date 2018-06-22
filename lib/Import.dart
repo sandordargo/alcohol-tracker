@@ -7,11 +7,9 @@ import 'dart:convert';
 import 'dart:io';
 
 class Import extends StatefulWidget {
-  BuildContext _scaffoldContext;
+  final BuildContext _scaffoldContext;
 
-  Import(_scaffoldContext) {
-    this._scaffoldContext = _scaffoldContext;
-  }
+  Import(this._scaffoldContext);
 
   @override
   _ImportState createState() => new _ImportState(_scaffoldContext);
@@ -20,8 +18,18 @@ class Import extends StatefulWidget {
 class _ImportState extends State<Import> {
   BuildContext _scaffoldContext;
 
-  _ImportState(_scaffoldContext) {
-    this._scaffoldContext = _scaffoldContext;
+  _ImportState(this._scaffoldContext);
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        appBar: new AppBar(
+          title: const Text('Import consumption data'),
+        ),
+        body: new ConstrainedBox(
+          constraints: const BoxConstraints.expand(),
+          child: _buildBody(),
+        ));
   }
 
   Widget _buildBody() {
@@ -40,37 +48,61 @@ class _ImportState extends State<Import> {
               child: const Text('Import data'),
               onPressed: () {
                 Navigator.pop(context);
-                importData();
-                Scaffold.of(_scaffoldContext).showSnackBar(
-                    new SnackBar(content: new Text('Data import finished')));
+                _handleImport();
               },
             ),
           ],
         ));
   }
 
-  importData() async {
-    List<String> csvEntries = await fetchData();
+  _handleImport() async {
+    List<String> csvEntries = await _fetchData();
+    _importData(csvEntries);
+    _showSnackbar(csvEntries);
+  }
+
+  void _importData(List<String> csvEntries) {
+       if (csvEntries.isNotEmpty) {
+      List<Drink> drinks = _extractDrinksFromData(csvEntries);
+      DrinkDatabase.get().deleteAll();
+      _insertDrinks(drinks);
+    }
+  }
+
+  void _showSnackbar(List<String> csvEntries) {
+    Text content = new Text(csvEntries.isNotEmpty ?
+    'Data import finished successfully' : "Data import failed");
+    Scaffold.of(_scaffoldContext).showSnackBar(
+        new SnackBar(content: content));
+  }
+
+  List<Drink> _extractDrinksFromData(List<String> csvEntries) {
     List<Drink> drinks = new List();
     removeHeaders(csvEntries);
     for (var line in csvEntries) {
       var fields = line.split(',');
-      if (fields[1].trimLeft() != "-" && fields[1].isNotEmpty) {
-        print(fields);
-        print("a" + fields[1] + "a");
-        var dateFields = fields[0].split("/");
+      if (_isLineFilled(fields)) {
         drinks.add(new Drink(
             name: fields[1],
             volume: (double.parse(fields[2]) * 1000).round(),
             strength: double.parse(fields[3]),
             unit: double.parse(fields[4]),
-            consumptionDate: new DateTime(int.parse(dateFields[0]),
-                    int.parse(dateFields[1]), int.parse(dateFields[2]))
-                .millisecondsSinceEpoch));
+            consumptionDate: _extractConsumptionDateAsEpochFromString(fields[0])));
       }
     }
-    print(drinks);
-    DrinkDatabase.get().deleteAll();
+    return drinks;
+  }
+
+  int _extractConsumptionDateAsEpochFromString(String dateString) {
+    var dateFields = dateString.split("/");
+    return new DateTime(int.parse(dateFields[0]),
+        int.parse(dateFields[1]), int.parse(dateFields[2])).millisecondsSinceEpoch;
+
+  }
+
+  bool _isLineFilled(List<String> fields) => fields[1].trimLeft() != "-" && fields[1].isNotEmpty;
+
+  void _insertDrinks(List<Drink> drinks) {
     for (var drink in drinks) {
       DrinkDatabase.get().insertDrink(drink);
     }
@@ -80,7 +112,7 @@ class _ImportState extends State<Import> {
     csvEntries.removeAt(0);
   }
 
-  Future<List<String>> fetchData() async {
+  Future<List<String>> _fetchData() async {
     final String url =
         'https://docs.google.com/spreadsheets/d/e/2PACX-1vTfgFcbX95lQiX2aGBlVJLKeLR4IMPPK-AczuYjkOp22PN8CAb2WgUNDZ-iWT-I95Vff7aaZq5qtu1K/pub?gid=0&single=true&output=csv';
     var httpClient = new HttpClient();
@@ -102,15 +134,4 @@ class _ImportState extends State<Import> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: new AppBar(
-          title: const Text('Import consumption data'),
-        ),
-        body: new ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: _buildBody(),
-        ));
-  }
 }

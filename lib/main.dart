@@ -194,7 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: new Text(widget.title),
         actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.send), onPressed: import),
+          new IconButton(icon: new Icon(Icons.cloud_download), onPressed: import),
           new FlatButton(onPressed: exportData, child: new Text("Export data")),
           new FlatButton(onPressed: stats, child: new Text("Stats"))
         ],
