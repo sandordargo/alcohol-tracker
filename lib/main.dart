@@ -29,15 +29,15 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
+
   @override
   _MyHomePageState createState() => new _MyHomePageState();
-
 }
-
 
 class _MyHomePageState extends State<MyHomePage> {
   BuildContext _scaffoldContext;
   List<Drink> data;
+
   void addConsumption() {
     Navigator.push(
       context,
@@ -45,12 +45,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-
   void import() {
-   Navigator.push(
-     context,
-     new MaterialPageRoute(builder: (context) => new Import(_scaffoldContext)),
-   );
+    Navigator.push(
+      context,
+      new MaterialPageRoute(builder: (context) => new Import(_scaffoldContext)),
+    );
   }
 
   void exportData() {
@@ -80,16 +79,24 @@ class _MyHomePageState extends State<MyHomePage> {
             [yyyy, '-', mm, '-', dd
             ])}'),
         trailing: new Container(
-              child: new IconButton(icon: new Icon(Icons.delete), onPressed: (){_deleteConsumption(drink);},),
-//              margin: const EdgeInsets.symmetric(horizontal: 0.5)
+          child: new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: () {
+              _deleteConsumption(drink);
+            },
           ),
+//              margin: const EdgeInsets.symmetric(horizontal: 0.5)
+        ),
         title: new Text(
-            '${drink.name[0].toUpperCase() + drink.name.substring(1)}, ${drink
-                .unit.toStringAsPrecision(2)} units of alcohol',
-            style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0),),
-        subtitle: new Text('Volume: ${drink.volume}, strength: ${drink.strength}'),
-        onTap: (){_editConsumption(drink);},
-
+          '${drink.name[0].toUpperCase() + drink.name.substring(1)}, ${drink
+              .unit.toStringAsPrecision(2)} units of alcohol',
+          style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0),
+        ),
+        subtitle:
+            new Text('Volume: ${drink.volume}, strength: ${drink.strength}'),
+        onTap: () {
+          _editConsumption(drink);
+        },
       ));
       widgets.add(new Divider());
     }
@@ -201,14 +208,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: new List<Widget>(),
               );
             case ConnectionState.waiting:
-              return new Text('Awaiting result...');
+              return new Text('Loading data...');
             default:
-              print('ss $snapshot');
-              print(snapshot.error);
-              print(snapshot.data);
               if (!snapshot.hasError) {
-//                  return new ListView(children: getWidgetList(snapshot.data));
-              this.data = snapshot.data;
+                this.data = snapshot.data;
                 return new Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,18 +220,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     new Divider(),
                     new Expanded(
                         child: new ListView(
-                            children: getWidgetList(snapshot.data))
-                    ),
+                            children: getWidgetList(snapshot.data))),
                   ],
                 );
               }
-              return new ListView(children: <Widget>[]);
+              return new ListView(
+                  children: <Widget>[new Text(snapshot.error.toString())]);
           }
         },
       )),
       floatingActionButton: new FloatingActionButton(
         onPressed: addConsumption,
-        tooltip: 'Increment',
+        tooltip: 'Register new consumption',
         child: new Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
@@ -245,14 +248,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void _deleteConsumption(item) {
     setState(() {
       DrinkDatabase.get().deleteDrink(item);
-
     });
-    showDialog(context: context, builder: (context) {
-      return new AlertDialog(
-        title: new Text("You want to delete $item"),
-      );
-    }
-    );
+    showDialog(
+        context: context,
+        builder: (context) {
+          return new AlertDialog(
+            title: new Text("You want to delete $item"),
+          );
+        });
   }
 
   void _editConsumption(item) {
