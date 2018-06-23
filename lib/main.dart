@@ -88,23 +88,19 @@ class _MyHomePageState extends State<MyHomePage> {
             new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate),
             [yyyy, '-', mm, '-', dd
             ])}'),
-        trailing: new Column(children: [
-          new Container(
+        trailing: new Container(
               child: new IconButton(icon: new Icon(Icons.delete), onPressed: (){_deleteConsumption(drink);},),
 //              margin: const EdgeInsets.symmetric(horizontal: 0.5)
           ),
-          new Container(
-              child: new IconButton(icon: new Icon(Icons.edit), onPressed: (){_editConsumption(drink);},),
-//              margin: const EdgeInsets.symmetric(horizontal: 0.5)
-          ),
-        ]),
         title: new Text(
             '${drink.name[0].toUpperCase() + drink.name.substring(1)}, ${drink
                 .unit.toStringAsPrecision(2)} units of alcohol',
-            style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0)),
+            style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0),),
         subtitle: new Text('Volume: ${drink.volume}, strength: ${drink.strength}'),
+        onTap: (){_editConsumption(drink);},
 
       ));
+      widgets.add(new Divider());
     }
     return widgets;
   }
@@ -225,6 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     getMainStats(snapshot.data),
+                    new Divider(),
                     new Expanded(
                         child: new ListView(
                             children: getWidgetList(snapshot.data))
