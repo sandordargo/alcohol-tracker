@@ -169,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
         new Text(
             "That's average of ${(unitsConsumedInLast7Days / 7)
                 .toStringAsPrecision(2)} per day and "
-            "${(unitsConsumedInLast7Days / drinks.length)
+            "${(unitsConsumedInLast7Days / daysDrink.length)
                 .toStringAsPrecision(2)} on the days you drank",
             style: new TextStyle(fontSize: 20.0, color: Colors.black))
       ],
