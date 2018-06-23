@@ -47,19 +47,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
   void import() {
-   print("import");
    Navigator.push(
      context,
      new MaterialPageRoute(builder: (context) => new Import(_scaffoldContext)),
    );
-//   Scaffold.of(_scaffoldContext).showSnackBar(new SnackBar(
-//       content: new Text('Server error')));
   }
 
   void exportData() {
-    print("expdatabeg");
-    print(data);
-    print("expdataend");
     Navigator.push(
       context,
       new MaterialPageRoute(builder: (context) => new ExportData(data)),
@@ -74,10 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<Drink>> getFromDb() async {
-    var db = DrinkDatabase.get();
-    print(db.getAllDrinks());
-    List<Drink> drinks = await db.getAllDrinks();
-    return drinks;
+    return await DrinkDatabase.get().getAllDrinks();
   }
 
   List<Widget> getWidgetList(List<Drink> drinks) {
@@ -242,23 +233,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Color getColorForAlcoholConsumed(double unitsConsumedInLast7Days) {
-    if (unitsConsumedInLast7Days > 10.0) {
-      return Colors.red;
-    }
-    return Colors.green;
+    return unitsConsumedInLast7Days > 10.0 ? Colors.red : Colors.green;
   }
 
   Color getColorForAlcoholFreeDays(int alcoholFreeDays) {
-    if (alcoholFreeDays < 2) {
-      return Colors.red;
-    }
-    return Colors.green;
+    return alcoholFreeDays < 2 ? Colors.red : Colors.green;
   }
 
   void _deleteConsumption(item) {
     setState(() {
-      var db = DrinkDatabase.get();
-      db.deleteDrink(item);
+      DrinkDatabase.get().deleteDrink(item);
 
     });
     showDialog(context: context, builder: (context) {
@@ -276,7 +260,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-//child: new ListView(
-//children: list,
-//)
