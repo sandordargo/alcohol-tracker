@@ -11,6 +11,8 @@ import 'package:date_format/date_format.dart';
 
 void main() => runApp(new MyApp());
 
+class DataChangeNotification extends Notification {}
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -82,7 +84,27 @@ class _MyHomePageState extends State<MyHomePage> {
           child: new IconButton(
             icon: new Icon(Icons.delete),
             onPressed: () {
-              _deleteConsumption(drink);
+              AlertDialog dialog = new AlertDialog(
+                content: new Text(
+                  "Do you really want to delete this drink?",
+                  style: new TextStyle(fontSize: 30.0),
+                ),
+                actions: <Widget>[
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _deleteConsumption(drink);
+                      },
+                      child: new Text('Yes')),
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: new Text('No')),
+                ],
+              );
+
+              showDialog(context: context, builder: (context) => dialog);
             },
           ),
 //              margin: const EdgeInsets.symmetric(horizontal: 0.5)
@@ -174,67 +196,74 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  bool _onNotification(dynamic notif) {
+    if (isDataChangeNotification(notif)) {
+      setState(() {});
+    }
+    return false;
+  }
+
+  bool isDataChangeNotification(notif) =>
+      notif.toString() == "DataChangeNotification()";
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return new Scaffold(
-      appBar: new AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: new Text(widget.title),
-        actions: <Widget>[
-          new IconButton(
-              icon: new Icon(Icons.cloud_download), onPressed: import),
-          new IconButton(
-              icon: new Icon(Icons.cloud_upload), onPressed: exportData),
-          new FlatButton(onPressed: stats, child: new Text("Stats"))
-        ],
-      ),
-      body: new Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
-          child: new FutureBuilder<List<Drink>>(
-        future: getFromDb(),
-        builder: (BuildContext context, AsyncSnapshot<List<Drink>> snapshot) {
-          this._scaffoldContext = context;
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return new ListView(
-                children: new List<Widget>(),
-              );
-            case ConnectionState.waiting:
-              return new Text('Loading data...');
-            default:
-              if (!snapshot.hasError) {
-                this.data = snapshot.data;
-                return new Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    getMainStats(snapshot.data),
-                    new Divider(),
-                    new Expanded(
-                        child: new ListView(
-                            children: getWidgetList(snapshot.data))),
-                  ],
-                );
+    return new NotificationListener(
+        onNotification: _onNotification,
+        child: new Scaffold(
+          appBar: new AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: new Text(widget.title),
+            actions: <Widget>[
+              new IconButton(
+                  icon: new Icon(Icons.cloud_download), onPressed: import),
+              new IconButton(
+                  icon: new Icon(Icons.cloud_upload), onPressed: exportData),
+              new FlatButton(onPressed: stats, child: new Text("Stats"))
+            ],
+          ),
+          body: new Center(
+              // Center is a layout widget. It takes a single child and positions it
+              // in the middle of the parent.
+              child: new FutureBuilder<List<Drink>>(
+            future: getFromDb(),
+            builder:
+                (BuildContext context, AsyncSnapshot<List<Drink>> snapshot) {
+              this._scaffoldContext = context;
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return new ListView(
+                    children: new List<Widget>(),
+                  );
+                case ConnectionState.waiting:
+                  return new Text('Loading data...');
+                default:
+                  if (!snapshot.hasError) {
+                    this.data = snapshot.data;
+                    return new Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        getMainStats(snapshot.data),
+                        new Divider(),
+                        new Expanded(
+                            child: new ListView(
+                                children: getWidgetList(snapshot.data))),
+                      ],
+                    );
+                  }
+                  return new ListView(
+                      children: <Widget>[new Text(snapshot.error.toString())]);
               }
-              return new ListView(
-                  children: <Widget>[new Text(snapshot.error.toString())]);
-          }
-        },
-      )),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: addConsumption,
-        tooltip: 'Register new consumption',
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+            },
+          )),
+          floatingActionButton: new FloatingActionButton(
+            onPressed: addConsumption,
+            tooltip: 'Register new consumption',
+            child: new Icon(Icons.add),
+          ), // This trailing comma makes auto-formatting nicer for build methods.
+        ));
   }
 
   Color getColorForAlcoholConsumed(double unitsConsumedInLast7Days) {
@@ -249,13 +278,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       DrinkDatabase.get().deleteDrink(item);
     });
-    showDialog(
-        context: context,
-        builder: (context) {
-          return new AlertDialog(
-            title: new Text("You want to delete $item"),
-          );
-        });
   }
 
   void _editConsumption(item) {

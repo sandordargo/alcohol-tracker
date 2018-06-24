@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:myapp/DrinkDatabase.dart';
 import 'package:myapp/Drink.dart';
+import 'package:myapp/main.dart';
 
 import 'dart:convert';
 import 'dart:io';
@@ -17,6 +18,7 @@ class Import extends StatefulWidget {
 
 class _ImportState extends State<Import> {
   BuildContext _scaffoldContext;
+  DataChangeNotification notifier = new DataChangeNotification();
 
   _ImportState(this._scaffoldContext);
 
@@ -59,6 +61,11 @@ class _ImportState extends State<Import> {
     List<String> csvEntries = await _fetchData();
     _importData(csvEntries);
     _showSnackbar(csvEntries);
+    notifyParentAboutImport();
+  }
+
+  void notifyParentAboutImport() {
+    notifier.dispatch(_scaffoldContext);
   }
 
   void _importData(List<String> csvEntries) {
