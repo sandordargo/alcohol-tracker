@@ -7,6 +7,7 @@ import 'package:myapp/Stats.dart';
 import 'package:myapp/Import.dart';
 import 'dart:async';
 import 'package:myapp/ExportData.dart';
+import 'package:myapp/MainStats.dart';
 import 'package:date_format/date_format.dart';
 
 void main() => runApp(new MyApp());
@@ -125,77 +126,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return widgets;
   }
 
-  Widget getMainStats(List<Drink> drinks) {
-    var soberDaysInLast7Days = 0;
-    var unitsConsumedInLast7Days = 0.0;
-    var daysDrink = new Set();
-    for (var drink in drinks) {
-      if (new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate)
-          .isAfter(DateTime.now().subtract(new Duration(days: 7)))) {
-        unitsConsumedInLast7Days += drink.unit;
-        var consDate =
-            new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate);
-        daysDrink
-            .add(new DateTime(consDate.year, consDate.month, consDate.day));
-      }
-    }
-    return new Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        new Text(
-          'During the last 7 days you have had',
-          style: new TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        new RichText(
-          text: new TextSpan(
-            // Note: Styles for TextSpans must be explicitly defined.
-            // Child text spans will inherit styles from parent
-            style: new TextStyle(
-              fontSize: 20.0,
-              color: Colors.black,
-            ),
-            children: <TextSpan>[
-              new TextSpan(
-                  text: '${unitsConsumedInLast7Days.toStringAsPrecision(2)}',
-                  style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: getColorForAlcoholConsumed(
-                          unitsConsumedInLast7Days))),
-              new TextSpan(text: ' units of alcohol consumed'),
-            ],
-          ),
-        ),
-        new RichText(
-          text: new TextSpan(
-            // Note: Styles for TextSpans must be explicitly defined.
-            // Child text spans will inherit styles from parent
-            style: new TextStyle(
-              fontSize: 20.0,
-              color: Colors.black,
-            ),
-            children: <TextSpan>[
-              new TextSpan(
-                  text: '${7 - daysDrink.length}',
-                  style: new TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: getColorForAlcoholFreeDays(7 - daysDrink.length))),
-              new TextSpan(text: ' days without alcohol'),
-            ],
-          ),
-        ),
-        new Text(
-            "That's average of ${(unitsConsumedInLast7Days / 7)
-                .toStringAsPrecision(2)} per day and "
-            "${(unitsConsumedInLast7Days / daysDrink.length)
-                .toStringAsPrecision(2)} on the days you drank",
-            style: new TextStyle(fontSize: 20.0, color: Colors.black))
-      ],
-    );
-  }
-
   bool _onNotification(dynamic notif) {
     if (isDataChangeNotification(notif)) {
       setState(() {});
@@ -245,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        getMainStats(snapshot.data),
+                        buildMainStats(snapshot.data),
                         new Divider(),
                         new Expanded(
                             child: new ListView(
@@ -264,14 +194,6 @@ class _MyHomePageState extends State<MyHomePage> {
             child: new Icon(Icons.add),
           ), // This trailing comma makes auto-formatting nicer for build methods.
         ));
-  }
-
-  Color getColorForAlcoholConsumed(double unitsConsumedInLast7Days) {
-    return unitsConsumedInLast7Days > 10.0 ? Colors.red : Colors.green;
-  }
-
-  Color getColorForAlcoholFreeDays(int alcoholFreeDays) {
-    return alcoholFreeDays < 2 ? Colors.red : Colors.green;
   }
 
   void _deleteConsumption(item) {
