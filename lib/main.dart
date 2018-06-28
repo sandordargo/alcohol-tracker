@@ -163,11 +163,9 @@ class _MyHomePageState extends State<MyHomePage> {
               this._scaffoldContext = context;
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                  return new ListView(
-                    children: new List<Widget>(),
-                  );
+                  return makeNewProgressIndicator();
                 case ConnectionState.waiting:
-                  return new Text('Loading data...');
+                  return makeNewProgressIndicator();
                 default:
                   if (!snapshot.hasError) {
                     this.data = snapshot.data;
@@ -194,6 +192,10 @@ class _MyHomePageState extends State<MyHomePage> {
             child: new Icon(Icons.add),
           ), // This trailing comma makes auto-formatting nicer for build methods.
         ));
+  }
+
+  Widget makeNewProgressIndicator() {
+    return new Column(mainAxisAlignment: MainAxisAlignment.center, children: [new Container(child: new CircularProgressIndicator(), margin: EdgeInsets.symmetric(vertical: 20.0),), new Text("Loading data...")],);
   }
 
   void _deleteConsumption(item) {
