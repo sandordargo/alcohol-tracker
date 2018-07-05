@@ -1,3 +1,5 @@
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/AddConsumption.dart';
 import 'package:myapp/EditConsumption.dart';
@@ -13,6 +15,34 @@ import 'package:date_format/date_format.dart';
 void main() => runApp(new MyApp());
 
 class DataChangeNotification extends Notification {}
+
+class _LinkTextSpan extends TextSpan {
+  // Beware!
+  //
+  // This class is only safe because the TapGestureRecognizer is not
+  // given a deadline and therefore never allocates any resources.
+  //
+  // In any other situation -- setting a deadline, using any of the less trivial
+  // recognizers, etc -- you would have to manage the gesture recognizer's
+  // lifetime and call dispose() when the TextSpan was no longer being rendered.
+  //
+  // Since TextSpan itself is @immutable, this means that you would have to
+  // manage the recognizer from outside the TextSpan, e.g. in the State of a
+  // stateful widget that then hands the recognizer to the TextSpan.
+
+  _LinkTextSpan({TextStyle style, String url, String text})
+      : super(
+            style: style,
+            text: text ?? url,
+            recognizer: new TapGestureRecognizer()
+              ..onTap = () async {
+                if (await canLaunch(url)) {
+                  await launch(url);
+                } else {
+                  throw 'Could not launch $url';
+                }
+              });
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -150,7 +180,36 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: new Icon(Icons.cloud_download), onPressed: import),
               new IconButton(
                   icon: new Icon(Icons.cloud_upload), onPressed: exportData),
-              new FlatButton(onPressed: stats, child: new Text("Stats"))
+              new FlatButton(onPressed: stats, child: new Text("Stats")),
+              new IconButton(
+                  icon: new Icon(Icons.info),
+                  onPressed: () {
+                    AlertDialog dialog = new AlertDialog(
+                        content: new RichText(
+                            textAlign: TextAlign.justify,
+                            text: new TextSpan(
+                                text:
+                                    "This app is not for anti-alcoholics nor for alcoholics trying to quit booze.\n\n"
+                                    "They need an other type of help.\n\n"
+                                    "AlcoholTracker is for you if you are interested in tracking how much alcohol "
+                                    "you consume. It helps you seting a limit or just "
+                                    "following the guidelines suggested by different organizations. "
+                                    "For any suggestions, feel free to contact me at ",
+                                style: new TextStyle(
+                                    fontSize: 20.0, color: Colors.black),
+                                children: [
+                                  new _LinkTextSpan(
+                                      text: "dev.sandor@gmail.com",
+                                      url:
+                                          "mailto:dev.sandor@gmai.com?subject=About AlcoholTracker",
+                                      style: new TextStyle(
+                                          color: Colors.blue,
+                                          decoration:
+                                              TextDecoration.underline)),
+                                  new TextSpan(text: ".")
+                                ])));
+                    showDialog(context: context, builder: (context) => dialog);
+                  }),
             ],
           ),
           body: new Center(
@@ -195,7 +254,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget makeNewProgressIndicator() {
-    return new Column(mainAxisAlignment: MainAxisAlignment.center, children: [new Container(child: new CircularProgressIndicator(), margin: EdgeInsets.symmetric(vertical: 20.0),), new Text("Loading data...")],);
+    return new Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        new Container(
+          child: new CircularProgressIndicator(),
+          margin: EdgeInsets.symmetric(vertical: 20.0),
+        ),
+        new Text("Loading data...")
+      ],
+    );
   }
 
   void _deleteConsumption(item) {

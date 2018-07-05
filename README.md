@@ -9,16 +9,20 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* Add about me
-This app is not for anti-alcoholics.
-* Export database to csv and send it
+* Unify the format of csv and database
 * INSERT OR REPLACE
 * Add detailed stats
-* Import database from csv
+* Limit the length of list on main page
+* Add page with all the alcohol. don't load all at once
+* exoprt to google docs
+* add settings: weekly limit, days without alcohol
 
 
 
 ## DONE
+* Add about me
+* Import database from csv
+* Export database to csv and send it
 * What do I want to store in the database?
 * Add appbar with three dots
 * Delete consumption
