@@ -9,7 +9,6 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* Unify the format of csv and database
 * INSERT OR REPLACE
 * Add detailed stats
 * Limit the length of list on main page
@@ -20,6 +19,7 @@ For help getting started with Flutter, view our online
 
 
 ## DONE
+* Unify the format of csv and database
 * Add about me
 * Import database from csv
 * Export database to csv and send it

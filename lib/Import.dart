@@ -91,7 +91,7 @@ class _ImportState extends State<Import> {
       if (_isLineFilled(fields)) {
         drinks.add(new Drink(
             name: fields[1],
-            volume: (double.parse(fields[2]) * 1000).round(),
+            volume: (int.parse(fields[2])),
             strength: double.parse(fields[3]),
             unit: double.parse(fields[4]),
             consumptionDate: _extractConsumptionDateAsEpochFromString(fields[0])));
