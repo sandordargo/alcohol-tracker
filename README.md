@@ -9,16 +9,15 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* INSERT OR REPLACE
-* Add detailed stats
 * Limit the length of list on main page
 * Add page with all the alcohol. don't load all at once
 * exoprt to google docs
 * add settings: weekly limit, days without alcohol
-
+* Add detailed stats
 
 
 ## DONE
+* INSERT OR REPLACE
 * Unify the format of csv and database
 * Add about me
 * Import database from csv

@@ -1,8 +1,7 @@
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/AddConsumption.dart';
-import 'package:myapp/EditConsumption.dart';
+import 'package:myapp/UpsertConsumption.dart';
 import 'package:myapp/DrinkDatabase.dart';
 import 'package:myapp/Drink.dart';
 import 'package:myapp/Stats.dart';
@@ -74,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void addConsumption() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new RegisterConsumption()),
+      new MaterialPageRoute(builder: (context) => new UpsertConsumption()),
     );
   }
 
@@ -275,7 +274,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _editConsumption(item) {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new EditConsumption(item)),
+      new MaterialPageRoute(builder: (context) => new UpsertConsumption(drink: item)),
     );
   }
 }

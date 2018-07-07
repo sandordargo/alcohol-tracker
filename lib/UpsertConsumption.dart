@@ -4,9 +4,14 @@ import 'package:myapp/Drink.dart';
 import 'dart:async';
 import 'package:date_format/date_format.dart';
 
-class RegisterConsumption extends StatefulWidget {
+class UpsertConsumption extends StatefulWidget {
+  final Drink drink;
+
+  UpsertConsumption({this.drink});
+
   @override
-  _RegisterConsumptionState createState() => new _RegisterConsumptionState();
+  _UpsertConsumptionState createState() =>
+      new _UpsertConsumptionState(drink: this.drink);
 }
 
 // add margins to suffixes
@@ -16,17 +21,37 @@ class RegisterConsumption extends StatefulWidget {
 // ml or cl
 // drop down for drinks
 
-class _RegisterConsumptionState extends State<RegisterConsumption> {
-  final titleController = new TextEditingController();
-  final volumeController = new TextEditingController();
-  final strengthController = new TextEditingController();
-  final remarkController = new TextEditingController();
-  DateTime selectedDay = new DateTime.now();
-  Text selectedDayText =
-      new Text("You had this drink today (${formatDate(DateTime.now(),
-      [yyyy, '-', mm, '-', dd])})");
-  Text consumedUnitsText = new Text("That's a drink of 0 units of alcohol.");
-  double consumedUnits = 0.0;
+class _UpsertConsumptionState extends State<UpsertConsumption> {
+  Drink drink;
+  TextEditingController titleController;
+  TextEditingController volumeController;
+  TextEditingController strengthController;
+  TextEditingController remarkController;
+  DateTime selectedDay;
+  Text selectedDayText;
+  Text consumedUnitsText;
+  double consumedUnits;
+
+  _UpsertConsumptionState({this.drink}) {
+    titleController =
+        new TextEditingController(text: drink == null ? null : drink.name);
+    volumeController = new TextEditingController(
+        text: drink == null ? null : drink.volume.toString());
+    strengthController = new TextEditingController(
+        text: drink == null ? null : drink.strength.toString());
+    remarkController =
+        new TextEditingController(text: drink == null ? null : drink.remark);
+    selectedDay = drink == null
+        ? new DateTime.now()
+        : new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate);
+    selectedDayText = new Text("You had this drink on (${formatDate(selectedDay,
+        [yyyy, '-', mm, '-', dd])})");
+    consumedUnits =
+        drink == null ? 0.0 : drink.volume * (drink.strength / 100) * (8 / 100);
+    consumedUnitsText =
+        new Text("That's a drink of ${consumedUnits.toStringAsPrecision(
+            2)} units of alcohol.");
+  }
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -50,7 +75,9 @@ class _RegisterConsumptionState extends State<RegisterConsumption> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text("Register a drink you consumed"),
+          title: new Text(drink == null
+              ? "Add a drink you consumed"
+              : "Edit a past consumption"),
         ),
         body: new Center(
           child: new Container(
@@ -145,6 +172,7 @@ class _RegisterConsumptionState extends State<RegisterConsumption> {
                           Navigator.pop(context);
                           var db = DrinkDatabase.get();
                           Drink consumption = new Drink(
+                              id: drink != null ? drink.id : null,
                               name: titleController.text,
                               volume: int.parse(volumeController.text),
                               strength: double.parse(strengthController.text),
@@ -152,7 +180,7 @@ class _RegisterConsumptionState extends State<RegisterConsumption> {
                               consumptionDate:
                                   selectedDay.millisecondsSinceEpoch,
                               remark: remarkController.text);
-                          db.insertDrink(consumption);
+                          db.upsertDrink(consumption);
 
                           return showDialog(
                             context: context,
@@ -162,7 +190,7 @@ class _RegisterConsumptionState extends State<RegisterConsumption> {
                                 // TextEditingController
                                 content:
                                     new Text("You consumed, ${titleController
-                                            .text}"),
+                                        .text}"),
                               );
                             },
                           );
