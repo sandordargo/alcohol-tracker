@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<Drink>> getFromDb() async {
-    return await DrinkDatabase.get().getAllDrinks();
+    return await DrinkDatabase.get().getDrinksFromLastMonth();
   }
 
   List<Widget> getWidgetList(List<Drink> drinks) {

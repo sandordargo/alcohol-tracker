@@ -83,6 +83,33 @@ class DrinkDatabase {
         ]);
   }
 
+  Future<List<Drink>> getDrinksFromLastMonth() async {
+    var now = new DateTime.now();
+    var dateLimit = new DateTime(now.year, now.month - 1, now.day, 0,0);
+    var dateLimitInt = dateLimit.millisecondsSinceEpoch;
+
+
+    var db = await _getDb();
+    var result = await db
+        .rawQuery('SELECT * FROM $tableName '
+        'WHERE CONSUMPTION_DATE >= $dateLimitInt '
+        'ORDER BY CONSUMPTION_DATE DESC');
+    if (result.length == 0) return [];
+    List<Drink> drinks = [];
+    for (Map<String, dynamic> map in result) {
+      drinks.add(new Drink(
+          id: map["ID"],
+          name: map["DRINK"],
+          volume: map["VOLUME"],
+          strength: map["STRENGTH"],
+          unit: map["UNITS"],
+          consumptionDate: map["CONSUMPTION_DATE"],
+          remark: map["REMARK"]));
+    }
+    return drinks;
+  }
+
+
   Future<List<Drink>> getAllDrinks() async {
     var db = await _getDb();
     var result = await db

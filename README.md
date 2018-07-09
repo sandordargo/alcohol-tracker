@@ -9,7 +9,6 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* Limit the length of list on main page
 * Add page with all the alcohol. don't load all at once
 * exoprt to google docs
 * add settings: weekly limit, days without alcohol
@@ -22,6 +21,7 @@ For help getting started with Flutter, view our online
 
 
 ## DONE
+* Limit the length of list on main page
 * INSERT OR REPLACE
 * Unify the format of csv and database
 * Add about me
