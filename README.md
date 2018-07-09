@@ -14,6 +14,11 @@ For help getting started with Flutter, view our online
 * exoprt to google docs
 * add settings: weekly limit, days without alcohol
 * Add detailed stats
+* Rename and add Icon
+* Add to my portfolio
+* Write a post about it
+* Redesign import page
+* Redesign export page
 
 
 ## DONE
