@@ -9,8 +9,8 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* Add page with all the alcohol. don't load all at once
-* exoprt to google docs
+* Fix data upload - we are losing data
+* Remove current user?
 * add settings: weekly limit, days without alcohol
 * Add detailed stats
 * Rename and add Icon
@@ -21,6 +21,11 @@ For help getting started with Flutter, view our online
 
 
 ## DONE
+* Sign in handler
+* Add user to Drawer, setstate
+* exoprt to google docs
+* How to keep share menu bar
+* Add page with all the alcohol.
 * Limit the length of list on main page
 * INSERT OR REPLACE
 * Unify the format of csv and database

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:myapp/DrinkDatabase.dart';
 import 'package:myapp/Drink.dart';
+import 'package:myapp/MyDrawer.dart';
 
 // Define a Custom Form Widget
 class Stats extends StatefulWidget {
@@ -14,6 +15,7 @@ class Stats extends StatefulWidget {
 class _StatsState extends State<Stats>{
   final emailController = new TextEditingController();
   final String name;
+  BuildContext _scaffoldContext;
   _StatsState({this.name});
 
 
@@ -54,6 +56,7 @@ class _StatsState extends State<Stats>{
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new Scaffold(
+      drawer: new MyDrawer(_scaffoldContext),
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -68,6 +71,7 @@ class _StatsState extends State<Stats>{
           child: new FutureBuilder<List<Drink>>(
             future: getFromDb(),
             builder: (BuildContext context, AsyncSnapshot<List<Drink>> snapshot) {
+              _scaffoldContext = context;
               switch (snapshot.connectionState) {
                 case ConnectionState.none: return new ListView(
                   children: new List<Widget>(),
