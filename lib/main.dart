@@ -54,10 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void exportData() {
+  void exportData() async {
+    List<Drink> drinks = await DrinkDatabase.get().getAllDrinks();
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new UploadData(this.data)),
+      new MaterialPageRoute(builder: (context) => new UploadData(drinks)),
     );
   }
 

@@ -9,7 +9,6 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* Fix data upload - we are losing data
 * Remove current user?
 * add settings: weekly limit, days without alcohol
 * Add detailed stats
@@ -21,6 +20,7 @@ For help getting started with Flutter, view our online
 
 
 ## DONE
+* Fix data upload - we are losing data
 * Sign in handler
 * Add user to Drawer, setstate
 * exoprt to google docs
