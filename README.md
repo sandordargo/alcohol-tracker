@@ -20,6 +20,7 @@ For help getting started with Flutter, view our online
 
 
 ## DONE
+* Disallow saving empty data
 * Fix data upload - we are losing data
 * Sign in handler
 * Add user to Drawer, setstate

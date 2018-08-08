@@ -31,6 +31,7 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
   Text selectedDayText;
   Text consumedUnitsText;
   double consumedUnits;
+  final _formKey = GlobalKey<FormState>();
 
   _UpsertConsumptionState({this.drink}) {
     titleController =
@@ -50,6 +51,29 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
         drink == null ? 0.0 : drink.volume * (drink.strength / 100) * (8 / 100);
     consumedUnitsText =
         new Text("That's a drink of ${consumedUnits.toStringAsPrecision(
+            2)} units of alcohol.");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    volumeController.addListener(_updateConsumedUnits);
+    strengthController.addListener(_updateConsumedUnits);
+  }
+
+  @override
+  void dispose() {
+    volumeController.removeListener(_updateConsumedUnits);
+    strengthController.removeListener(_updateConsumedUnits);
+  }
+
+
+  void _updateConsumedUnits() {
+    consumedUnits = int.parse(volumeController.text) *
+        (double.parse(strengthController.text) / 100) *
+        (8 / 100);
+    consumedUnitsText = new Text(
+        "That's a drink of ${consumedUnits.toStringAsPrecision(
             2)} units of alcohol.");
   }
 
@@ -79,13 +103,19 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
               ? "Add a drink you consumed"
               : "Edit a past consumption"),
         ),
-        body: new Center(
+        body: new Form(
+          key: _formKey,
           child: new Container(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: new Column(children: [
               new Container(
                 padding: const EdgeInsets.only(bottom: 8.0),
-                child: new TextField(
+                child: new TextFormField(
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                  },
                   controller: titleController,
                   keyboardType: TextInputType.text,
                   decoration: new InputDecoration(
@@ -95,16 +125,13 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
               ),
               new Container(
                 padding: const EdgeInsets.only(bottom: 8.0),
-                child: new TextField(
-                  controller: volumeController,
-                  onChanged: (text) {
-                    consumedUnits = int.parse(text) *
-                        (double.parse(strengthController.text) / 100) *
-                        (8 / 100);
-                    consumedUnitsText = new Text(
-                        "That's a drink of ${consumedUnits.toStringAsPrecision(
-                            2)} units of alcohol.");
+                child: new TextFormField(
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please a volume text';
+                    }
                   },
+                  controller: volumeController,
                   keyboardType: TextInputType.number,
                   decoration: new InputDecoration(
                       border: InputBorder.none,
@@ -114,16 +141,13 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
               ),
               new Container(
                 padding: const EdgeInsets.only(bottom: 8.0),
-                child: new TextField(
-                  controller: strengthController,
-                  onChanged: (text) {
-                    consumedUnits = int.parse(volumeController.text) *
-                        (double.parse(text) / 100) *
-                        (8 / 100);
-                    consumedUnitsText = new Text(
-                        "That's a drink of ${consumedUnits.toStringAsPrecision(
-                            2)} units of alcohol.");
+                child: new TextFormField(
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter the strength';
+                    }
                   },
+                  controller: strengthController,
                   keyboardType: TextInputType.number,
                   decoration: new InputDecoration(
                       border: InputBorder.none,
@@ -169,6 +193,9 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
                       padding: const EdgeInsets.only(right: 10.0),
                       child: new RaisedButton(
                         onPressed: () {
+                          if (!_formKey.currentState.validate()) {
+                            return null;
+                          }
                           Navigator.pop(context);
                           var db = DrinkDatabase.get();
                           Drink consumption = new Drink(
