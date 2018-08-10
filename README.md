@@ -20,6 +20,7 @@ For help getting started with Flutter, view our online
 
 
 ## DONE
+* add settings page: weekly limit, days without alcohol
 * Disallow saving empty data
 * Fix data upload - we are losing data
 * Sign in handler
