@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:myapp/UploadData.dart';
 import 'package:myapp/MainStats.dart';
 import 'package:date_format/date_format.dart';
+import 'package:myapp/prefs.dart';
 
 class AllDrinksList extends StatefulWidget {
   AllDrinksList();
@@ -20,6 +21,27 @@ class AllDrinksList extends StatefulWidget {
 class _AllDrinksListState extends State<AllDrinksList> {
   BuildContext _scaffoldContext;
   List<Drink> data;
+  double _weeklyLimit;
+  int _weeklySoberDaysLimit;
+  Prefs prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    setWeeklyLimit();
+    setWeeklySoberDaysLimit();
+  }
+
+  void setWeeklyLimit() async {
+    this._weeklyLimit = await Prefs.getDoubleF("weeklyLimit");
+    this._weeklyLimit = this._weeklyLimit == 0.0 ? 10.0 : this._weeklyLimit;
+  }
+
+  void setWeeklySoberDaysLimit() async {
+    this._weeklySoberDaysLimit = await Prefs.getIntF("soberDaysLimit");
+    this._weeklySoberDaysLimit =
+        this._weeklyLimit == 0 ? 2 : this._weeklySoberDaysLimit;
+  }
 
   void addConsumption() {
     Navigator.push(
@@ -31,7 +53,8 @@ class _AllDrinksListState extends State<AllDrinksList> {
   void import() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new ImportV2(_scaffoldContext)),
+      new MaterialPageRoute(
+          builder: (context) => new ImportV2(_scaffoldContext)),
     );
   }
 
@@ -55,54 +78,54 @@ class _AllDrinksListState extends State<AllDrinksList> {
 
   List<Widget> getWidgetList(List<Drink> drinks) {
     List<Widget> widgets = new List<Widget>();
-      for (var drink in drinks) {
-        widgets.add(new ListTile(
-          leading: new Text('${formatDate(
-              new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate),
-              [yyyy, '-', mm, '-', dd
-              ])}'),
-          trailing: new Container(
-            child: new IconButton(
-              icon: new Icon(Icons.delete),
-              onPressed: () {
-                AlertDialog dialog = new AlertDialog(
-                  content: new Text(
-                    "Do you really want to delete this drink?",
-                    style: new TextStyle(fontSize: 30.0),
-                  ),
-                  actions: <Widget>[
-                    new FlatButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _deleteConsumption(drink);
-                        },
-                        child: new Text('Yes')),
-                    new FlatButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: new Text('No')),
-                  ],
-                );
+    for (var drink in drinks) {
+      widgets.add(new ListTile(
+        leading: new Text('${formatDate(
+            new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate),
+            [yyyy, '-', mm, '-', dd
+            ])}'),
+        trailing: new Container(
+          child: new IconButton(
+            icon: new Icon(Icons.delete),
+            onPressed: () {
+              AlertDialog dialog = new AlertDialog(
+                content: new Text(
+                  "Do you really want to delete this drink?",
+                  style: new TextStyle(fontSize: 30.0),
+                ),
+                actions: <Widget>[
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _deleteConsumption(drink);
+                      },
+                      child: new Text('Yes')),
+                  new FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: new Text('No')),
+                ],
+              );
 
-                showDialog(context: context, builder: (context) => dialog);
-              },
-            ),
+              showDialog(context: context, builder: (context) => dialog);
+            },
+          ),
 //              margin: const EdgeInsets.symmetric(horizontal: 0.5)
-          ),
-          title: new Text(
-            '${drink.name[0].toUpperCase() + drink.name.substring(1)}, ${drink
-                .unit.toStringAsPrecision(2)} units of alcohol',
-            style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0),
-          ),
-          subtitle:
-          new Text('Volume: ${drink.volume}, strength: ${drink.strength}'),
-          onTap: () {
-            _editConsumption(drink);
-          },
-        ));
-        widgets.add(new Divider());
-      }
+        ),
+        title: new Text(
+          '${drink.name[0].toUpperCase() + drink.name.substring(1)}, ${drink
+              .unit.toStringAsPrecision(2)} units of alcohol',
+          style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 20.0),
+        ),
+        subtitle:
+            new Text('Volume: ${drink.volume}, strength: ${drink.strength}'),
+        onTap: () {
+          _editConsumption(drink);
+        },
+      ));
+      widgets.add(new Divider());
+    }
     return widgets;
   }
 
@@ -140,6 +163,8 @@ class _AllDrinksListState extends State<AllDrinksList> {
             future: getFromDb(),
             builder:
                 (BuildContext context, AsyncSnapshot<List<Drink>> snapshot) {
+              setWeeklyLimit();
+              setWeeklySoberDaysLimit();
               this._scaffoldContext = context;
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
@@ -153,13 +178,15 @@ class _AllDrinksListState extends State<AllDrinksList> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildMainStats(snapshot.data),
+                        buildMainStats(snapshot.data, this._weeklyLimit,
+                            _weeklySoberDaysLimit),
                         new Divider(),
                         new Expanded(
-                            child: new Scrollbar(
-                  child: new ListView(
-                                children: getWidgetList(snapshot.data))),
-                        )],
+                          child: new Scrollbar(
+                              child: new ListView(
+                                  children: getWidgetList(snapshot.data))),
+                        )
+                      ],
                     );
                   }
                   return new ListView(
@@ -197,7 +224,8 @@ class _AllDrinksListState extends State<AllDrinksList> {
   void _editConsumption(item) {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new UpsertConsumption(drink: item)),
+      new MaterialPageRoute(
+          builder: (context) => new UpsertConsumption(drink: item)),
     );
   }
 }

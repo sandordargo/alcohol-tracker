@@ -15,6 +15,7 @@ dependencies:
   google_sign_in: any
   http: any
   url_launcher: 3.0.2
+  shared_preferences: "^0.4.2"
 
 dev_dependencies:
   flutter_test:

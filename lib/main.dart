@@ -8,6 +8,7 @@ import 'package:myapp/UploadData.dart';
 import 'package:myapp/MainStats.dart';
 import 'package:myapp/MyDrawer.dart';
 import 'package:date_format/date_format.dart';
+import 'package:myapp/prefs.dart';
 
 void main() => runApp(new MyApp());
 
@@ -39,6 +40,28 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   BuildContext _scaffoldContext;
   List<Drink> data;
+  double _weeklyLimit;
+  int _weeklySoberDaysLimit;
+  Prefs prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    setWeeklyLimit();
+    setWeeklySoberDaysLimit();
+  }
+
+
+  void setWeeklyLimit() async {
+    this._weeklyLimit = await Prefs.getDoubleF("weeklyLimit");
+    this._weeklyLimit = this._weeklyLimit == 0.0 ? 10.0 : this._weeklyLimit;
+  }
+
+  void setWeeklySoberDaysLimit() async {
+    this._weeklySoberDaysLimit = await Prefs.getIntF("soberDaysLimit");
+    this._weeklySoberDaysLimit =
+        this._weeklyLimit == 0 ? 2 : this._weeklySoberDaysLimit;
+  }
 
   void addConsumption() {
     Navigator.push(
@@ -50,7 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void import() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new ImportV2(_scaffoldContext)),
+      new MaterialPageRoute(
+          builder: (context) => new ImportV2(_scaffoldContext)),
     );
   }
 
@@ -153,6 +177,8 @@ class _MyHomePageState extends State<MyHomePage> {
             future: getFromDb(),
             builder:
                 (BuildContext context, AsyncSnapshot<List<Drink>> snapshot) {
+              setWeeklyLimit();
+              setWeeklySoberDaysLimit();
               this._scaffoldContext = context;
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
@@ -166,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildMainStats(snapshot.data),
+                        buildMainStats(snapshot.data, this._weeklyLimit, this._weeklySoberDaysLimit),
                         new Divider(),
                         new Expanded(
                             child: new ListView(
@@ -209,7 +235,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void _editConsumption(item) {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new UpsertConsumption(drink: item)),
+      new MaterialPageRoute(
+          builder: (context) => new UpsertConsumption(drink: item)),
     );
   }
 }

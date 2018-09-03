@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/Drink.dart';
 
 
-Widget buildMainStats(List<Drink> drinks) {
-  var soberDaysInLast7Days = 0;
+Widget buildMainStats(List<Drink> drinks, double weeklyLimit, int weeklySoberDaysLimit) {
   var unitsConsumedInLast7Days = 0.0;
   var daysDrink = new Set();
   for (var drink in drinks) {
@@ -40,7 +39,7 @@ Widget buildMainStats(List<Drink> drinks) {
                 style: new TextStyle(
                     fontWeight: FontWeight.bold,
                     color: getColorForAlcoholConsumed(
-                        unitsConsumedInLast7Days))),
+                        unitsConsumedInLast7Days, weeklyLimit))),
             new TextSpan(text: ' units of alcohol consumed'),
           ],
         ),
@@ -58,7 +57,7 @@ Widget buildMainStats(List<Drink> drinks) {
                 text: '${7 - daysDrink.length}',
                 style: new TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: getColorForAlcoholFreeDays(7 - daysDrink.length))),
+                    color: getColorForAlcoholFreeDays(7 - daysDrink.length, weeklySoberDaysLimit))),
             new TextSpan(text: ' days without alcohol'),
           ],
         ),
@@ -73,10 +72,10 @@ Widget buildMainStats(List<Drink> drinks) {
   );
 }
 
-Color getColorForAlcoholConsumed(double unitsConsumedInLast7Days) {
-  return unitsConsumedInLast7Days > 10.0 ? Colors.red : Colors.green;
+Color getColorForAlcoholConsumed(double unitsConsumedInLast7Days, double weeklyLimit) {
+  return unitsConsumedInLast7Days > weeklyLimit ? Colors.red : Colors.green;
 }
 
-Color getColorForAlcoholFreeDays(int alcoholFreeDays) {
-  return alcoholFreeDays < 2 ? Colors.red : Colors.green;
+Color getColorForAlcoholFreeDays(int alcoholFreeDays, int weeklySoberDaysLimit) {
+  return alcoholFreeDays < weeklySoberDaysLimit ? Colors.red : Colors.green;
 }

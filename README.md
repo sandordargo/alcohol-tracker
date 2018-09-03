@@ -9,17 +9,18 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* Remove current user?
-* add settings: weekly limit, days without alcohol
 * Add detailed stats
 * Rename and add Icon
 * Add to my portfolio
 * Write a post about it
 * Redesign import page
 * Redesign export page
+* Remove current user?
+* imperial/metric unit settings
 
 
 ## DONE
+* Use weekly Limit and sober days settings in all drinks too
 * add settings page: weekly limit, days without alcohol
 * Disallow saving empty data
 * Fix data upload - we are losing data
