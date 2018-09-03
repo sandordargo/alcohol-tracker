@@ -43,7 +43,7 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
     remarkController =
         new TextEditingController(text: drink == null ? null : drink.remark);
     selectedDay = drink == null
-        ? new DateTime.now()
+        ? _getTodayAtMindnight()
         : new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate);
     selectedDayText = new Text("You had this drink on (${formatDate(selectedDay,
         [yyyy, '-', mm, '-', dd])})");
@@ -52,6 +52,11 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
     consumedUnitsText =
         new Text("That's a drink of ${consumedUnits.toStringAsPrecision(
             2)} units of alcohol.");
+  }
+
+  DateTime _getTodayAtMindnight() {
+    DateTime now = new DateTime.now();
+    return DateTime(now.year, now.month, now.day);
   }
 
   @override
