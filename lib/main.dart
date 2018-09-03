@@ -192,7 +192,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildMainStats(snapshot.data, this._weeklyLimit, this._weeklySoberDaysLimit),
+
+                        new MainStats(snapshot.data, this._weeklyLimit, this._weeklySoberDaysLimit, 7),
                         new Divider(),
                         new Expanded(
                             child: new ListView(

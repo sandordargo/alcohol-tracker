@@ -9,7 +9,6 @@ For help getting started with Flutter, view our online
 
 
 ## TODO
-* Add detailed stats
 * Rename and add Icon
 * Add to my portfolio
 * Write a post about it
@@ -17,9 +16,15 @@ For help getting started with Flutter, view our online
 * Redesign export page
 * Remove current user?
 * imperial/metric unit settings
+* Prefill based on name
+* Store type of drink
+* profile settings (WHO, Institute.., )
+* Robust synchro
+
 
 
 ## DONE
+* Add detailed stats
 * Use weekly Limit and sober days settings in all drinks too
 * add settings page: weekly limit, days without alcohol
 * Disallow saving empty data

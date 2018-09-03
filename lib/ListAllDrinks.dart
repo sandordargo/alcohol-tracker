@@ -68,7 +68,7 @@ class _AllDrinksListState extends State<AllDrinksList> {
   void stats() {
     Navigator.push(
       context,
-      new MaterialPageRoute(builder: (context) => new Stats(name: "pia")),
+      new MaterialPageRoute(builder: (context) => new Stats()),
     );
   }
 
@@ -178,8 +178,8 @@ class _AllDrinksListState extends State<AllDrinksList> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildMainStats(snapshot.data, this._weeklyLimit,
-                            _weeklySoberDaysLimit),
+                        new MainStats(snapshot.data, this._weeklyLimit,
+                            _weeklySoberDaysLimit, 7),
                         new Divider(),
                         new Expanded(
                           child: new Scrollbar(
