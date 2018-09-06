@@ -161,18 +161,4 @@ class DrinkDatabase {
     var db = await _getDb();
     return db.close();
   }
-
-  String getDatabasePath() {
-    File file = new File(DrinkDatabase.path + ".txt");
-    print(file.toString());
-    file.writeAsStringSync("blablabla");
-    file.createSync();
-    print(file.existsSync());
-    var bytes = UTF8.encode(file.readAsStringSync());
-    var base64 = BASE64.encode(bytes);
-    print(bytes);
-    print(base64);
-
-    return "data:text/plain;base64,"+ base64 ;
-  }
 }
