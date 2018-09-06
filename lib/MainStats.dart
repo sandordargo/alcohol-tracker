@@ -39,12 +39,12 @@ class _MainStatsState extends State<MainStats> {
 
   Widget buildMainStats(
       List<Drink> drinks, double weeklyLimit, int weeklySoberDaysLimit) {
-    var unitsConsumedInLast7Days = 0.0;
+    var unitsConsumedInLastXDays = 0.0;
     var daysDrink = new Set();
     for (var drink in drinks) {
       if (new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate)
           .isAfter(DateTime.now().subtract(new Duration(days: lastXDays)))) {
-        unitsConsumedInLast7Days += drink.unit;
+        unitsConsumedInLastXDays += drink.unit;
         var consDate =
             new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate);
         daysDrink
@@ -70,11 +70,11 @@ class _MainStatsState extends State<MainStats> {
             ),
             children: <TextSpan>[
               new TextSpan(
-                  text: '${unitsConsumedInLast7Days.toStringAsPrecision(2)}',
+                  text: '${unitsConsumedInLastXDays.toStringAsPrecision(2)}',
                   style: new TextStyle(
                       fontWeight: FontWeight.bold,
                       color: getColorForAlcoholConsumed(
-                          unitsConsumedInLast7Days, weeklyLimit))),
+                          unitsConsumedInLastXDays, weeklyLimit))),
               new TextSpan(text: ' units of alcohol consumed'),
             ],
           ),
@@ -98,20 +98,29 @@ class _MainStatsState extends State<MainStats> {
           ),
         ),
         new Text(
-            "That's average of ${(unitsConsumedInLast7Days / 7)
-                .toStringAsPrecision(2)} per day and "
-            "${(unitsConsumedInLast7Days / daysDrink.length)
-                .toStringAsPrecision(2)} on the days you drank",
+            getAverageWrappingPhase(unitsConsumedInLastXDays, daysDrink.length),
             style: new TextStyle(fontSize: 20.0, color: Colors.black)),
         new Text(
-            "Most alochol consumed during one day: ${maxDrinksADay
-                .value} (${formatDate(
-                maxDrinksADay.key,
-                [yyyy, '-', mm, '-', dd
-                ])})",
+            "Most alochol consumed during one day: "
+            "${maxDrinksADay.value.toStringAsPrecision(2)} "
+            "(${formatDate(maxDrinksADay.key, [yyyy, '-', mm, '-', dd])})",
             style: new TextStyle(fontSize: 20.0, color: Colors.black))
       ],
     );
+  }
+
+  String getAverageWrappingPhase(double consumedUnits, int numberOfDaysDrink) {
+    double averageConsumption = consumedUnits / this.lastXDays;
+    String basePhrase =
+        "That's average of ${averageConsumption.toStringAsPrecision(2)} "
+        "per day";
+    if (numberOfDaysDrink > 0) {
+      double averageConsumptionOnDrinkDays = consumedUnits / numberOfDaysDrink;
+      basePhrase +=
+          " and  ${averageConsumptionOnDrinkDays.toStringAsPrecision(2)} "
+          "on the days you drank";
+    }
+    return basePhrase;
   }
 
   MapEntry<DateTime, double> getMaxDrinksPerDay(List<Drink> drinks) {
