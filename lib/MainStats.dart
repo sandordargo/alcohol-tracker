@@ -148,12 +148,14 @@ class _MainStatsState extends State<MainStats> {
   }
 
   Color getColorForAlcoholConsumed(
-      double unitsConsumedInLast7Days, double weeklyLimit) {
-    return unitsConsumedInLast7Days > weeklyLimit ? Colors.red : Colors.green;
+      double unitsConsumedInLastXDays, double weeklyLimit) {
+    double limit = weeklyLimit * this.lastXDays / 7;
+    return unitsConsumedInLastXDays > limit ? Colors.red : Colors.green;
   }
 
   Color getColorForAlcoholFreeDays(
       int alcoholFreeDays, int weeklySoberDaysLimit) {
-    return alcoholFreeDays < weeklySoberDaysLimit ? Colors.red : Colors.green;
+    double limit = weeklySoberDaysLimit * this.lastXDays / 7;
+    return alcoholFreeDays < limit ? Colors.red : Colors.green;
   }
 }
