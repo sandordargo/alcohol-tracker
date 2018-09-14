@@ -13,17 +13,14 @@ import 'dart:convert';
 
 class DataImporter {
   final BuildContext _scaffoldContext;
-  GoogleSignInAccount _currentUser;
   DataChangeNotification notifier = new DataChangeNotification();
   static bool  importing = false;
   SignInContainer _signInContainer = new SignInContainer();
 
-  DataImporter(this._scaffoldContext) {
-    _currentUser = _signInContainer.getCurrentUser();
-  }
+  DataImporter(this._scaffoldContext);
 
   void import() {
-    if (_currentUser != null) {
+    if (_signInContainer.getCurrentUser() != null) {
       if (!DataImporter.importing) {
         DataImporter.importing = true;
         _handleImport().then((status) {

@@ -11,14 +11,12 @@ For help getting started with Flutter, view our online
 ## TODO
 * Rename and add Icon
 * Add to my portfolio
-* Write a post about it
 * Robust synchro
     * Sign in at startup time
     * If you don't sign in, gray sync button
     * Undo snackbar
     * Add an synced column?
 * imperial/metric unit settings
-* Remove current user?
 * Prefill based on name
 * Store type of drink
 * profile settings (WHO, Institute.., )
@@ -27,6 +25,8 @@ For help getting started with Flutter, view our online
 
 
 ## DONE
+* Remove current user?
+* Write a post about it
 * Robust synchro
     * At sync
         * if local is empty, import everything

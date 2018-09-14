@@ -18,7 +18,6 @@ class MyDrawer extends StatefulWidget {
 
 class _MyDrawerState extends State<MyDrawer> {
   final BuildContext _scaffoldContext;
-  GoogleSignInAccount _currentUser;
   SignInContainer _signInContainer = new SignInContainer();
 
   _MyDrawerState(this._scaffoldContext);
@@ -26,9 +25,7 @@ class _MyDrawerState extends State<MyDrawer> {
   @override
   void initState() {
     super.initState();
-    _currentUser = _signInContainer.getCurrentUser();
     _signInContainer.listen((account) {
-      _currentUser = account;
       if (this.mounted) {
         setState(() {});
       }
@@ -121,7 +118,7 @@ class _MyDrawerState extends State<MyDrawer> {
   }
 
   Widget getTitle() {
-    if (_currentUser == null) {
+    if (_signInContainer.getCurrentUser() == null) {
       return new ListTile(
         leading: getLead(),
         title: new Text("Sign in"),
@@ -130,18 +127,18 @@ class _MyDrawerState extends State<MyDrawer> {
     }
     return new ListTile(
       leading: getLead(),
-      title: new Text(_currentUser.displayName),
-      subtitle: new Text(_currentUser.email),
+      title: new Text(_signInContainer.getCurrentUser().displayName),
+      subtitle: new Text(_signInContainer.getCurrentUser().email),
       onTap: _signInContainer.handleSignOut,
     );
   }
 
   Widget getLead() {
-    if (_currentUser == null) {
+    if (_signInContainer.getCurrentUser() == null) {
       return new CircleAvatar(child: new Text("?"));
     }
     return new GoogleUserCircleAvatar(
-      identity: _currentUser,
+      identity: _signInContainer.getCurrentUser(),
     );
   }
 }

@@ -10,17 +10,14 @@ import 'package:myapp/SignInContainer.dart';
 
 class DataUploader {
   final List<Drink> data;
-  GoogleSignInAccount _currentUser;
   SignInContainer _signInContainer = new SignInContainer();
   static bool  exporting = false;
   final BuildContext _scaffoldContext;
 
-  DataUploader(this.data, this._scaffoldContext) {
-    _currentUser = _signInContainer.getCurrentUser();
-  }
+  DataUploader(this.data, this._scaffoldContext);
 
   void upload() {
-    if (_currentUser != null) {
+    if (_signInContainer.getCurrentUser() != null) {
       if (!DataUploader.exporting) {
         DataUploader.exporting = true;
         _exportData().then((status) {
