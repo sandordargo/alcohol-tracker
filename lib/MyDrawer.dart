@@ -3,7 +3,6 @@ import 'package:myapp/Stats.dart';
 import 'package:myapp/ListAllDrinks.dart';
 import 'package:myapp/main.dart';
 import 'package:myapp/HyperLinkTextSpan.dart';
-import 'package:myapp/ImportV2.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:myapp/SignInContainer.dart';
 import 'package:myapp/Settings.dart';
@@ -73,16 +72,6 @@ class _MyDrawerState extends State<MyDrawer> {
             Navigator.pop(ctxt);
             Navigator.push(
                 ctxt, new MaterialPageRoute(builder: (ctxt) => new Stats()));
-          },
-        ),
-        new ListTile(
-          title: new Text("Import"),
-          onTap: () {
-            Navigator.pop(ctxt);
-            Navigator.push(
-                ctxt,
-                new MaterialPageRoute(
-                    builder: (ctxt) => new ImportV2(_scaffoldContext)));
           },
         ),
         new ListTile(

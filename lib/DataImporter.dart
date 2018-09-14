@@ -11,93 +11,47 @@ import 'package:myapp/SignInContainer.dart';
 
 import 'dart:convert';
 
-class ImportV2 extends StatefulWidget {
-  final BuildContext _scaffoldContext;
-
-  ImportV2(this._scaffoldContext);
-
-  State createState() => new ImportV2State(this._scaffoldContext);
-}
-
-class ImportV2State extends State<ImportV2> {
+class DataImporter {
   final BuildContext _scaffoldContext;
   GoogleSignInAccount _currentUser;
   DataChangeNotification notifier = new DataChangeNotification();
+  static bool  importing = false;
   SignInContainer _signInContainer = new SignInContainer();
 
-  ImportV2State(this._scaffoldContext);
-
-  @override
-  void initState() {
-    super.initState();
+  DataImporter(this._scaffoldContext) {
     _currentUser = _signInContainer.getCurrentUser();
-    _signInContainer.listen((account) {
-      _currentUser = _signInContainer.getCurrentUser();
-      if (this.mounted) {
-        setState(() {});
-      }
-    });
   }
 
-  Widget _buildBody() {
+  void import() {
     if (_currentUser != null) {
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          new ListTile(
-            leading: new GoogleUserCircleAvatar(
-              identity: _currentUser,
-            ),
-            title: new Text(_currentUser.displayName),
-            subtitle: new Text(_currentUser.email),
-          ),
-          const Text("Signed in successfully."),
-          const Text(
-            "Importing the data will completely replace your current database.",
-            style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 20.0),
-            textAlign: TextAlign.center,
-          ),
-          new RaisedButton(
-            child: const Text('Import data'),
-            onPressed: () {
-              Navigator.pop(context);
-              _handleImport();
-            },
-          ),
-        ],
-      );
-    } else {
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          const Text(
-              "You are not currently signed in. In order to import data from your Google Drive, you have to sign in."),
-          new RaisedButton(
-            child: const Text('Sign in'),
-            onPressed: _signInContainer.handleSignIn,
-          ),
-        ],
-      );
+      if (!DataImporter.importing) {
+        DataImporter.importing = true;
+        _handleImport().then((status) {
+          DataImporter.importing = false;
+          _showSnackbar(new Text(status == 200
+              ? 'Data import finished successfully'
+              : "Data import failed"));
+        });
+      }
+    }
+    else {
+      _showSnackbar(Text("Login please for synching"));
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: new AppBar(
-          title: const Text('Import data'),
-        ),
-        body: new ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: _buildBody(),
-        ));
+  void _showSnackbar(Text content) {
+    Scaffold.of(_scaffoldContext).showSnackBar(new SnackBar(content: content));
   }
+
+
 
   _handleImport() async {
     List<String> csvEntries = await _fetchData();
     _importData(csvEntries);
     if (_scaffoldContext != null) {
-      _showSnackbar(csvEntries);
+      _showSnackbar(new Text(csvEntries.isNotEmpty
+          ? 'Data import finished successfully'
+          : "Data import failed"));
       notifyParentAboutImport();
     }
   }
@@ -112,13 +66,6 @@ class ImportV2State extends State<ImportV2> {
       DrinkDatabase.get().deleteAll();
       _insertDrinks(drinks);
     }
-  }
-
-  void _showSnackbar(List<String> csvEntries) {
-    Text content = new Text(csvEntries.isNotEmpty
-        ? 'Data import finished successfully'
-        : "Data import failed");
-    Scaffold.of(_scaffoldContext).showSnackBar(new SnackBar(content: content));
   }
 
   List<Drink> _extractDrinksFromData(List<String> csvEntries) {

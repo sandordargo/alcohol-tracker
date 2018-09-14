@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:myapp/UpsertConsumption.dart';
 import 'package:myapp/DrinkDatabase.dart';
 import 'package:myapp/Drink.dart';
-import 'package:myapp/ImportV2.dart';
+import 'package:myapp/DataImporter.dart';
 import 'dart:async';
-import 'package:myapp/UploadData.dart';
+import 'package:myapp/DataUploader.dart';
 import 'package:myapp/MainStats.dart';
 import 'package:myapp/MyDrawer.dart';
 import 'package:date_format/date_format.dart';
@@ -70,20 +70,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void import() {
-    Navigator.push(
-      context,
-      new MaterialPageRoute(
-          builder: (context) => new ImportV2(_scaffoldContext)),
-    );
-  }
-
-  void exportData() async {
+  void _synchronize() async {
     List<Drink> drinks = await DrinkDatabase.get().getAllDrinks();
-    Navigator.push(
-      context,
-      new MaterialPageRoute(builder: (context) => new UploadData(drinks)),
-    );
+    if (data.isEmpty && drinks.isEmpty) {
+      var importer = new DataImporter(_scaffoldContext);
+      importer.import();
+    } else {
+      var uploader = DataUploader(drinks, _scaffoldContext);
+      uploader.upload();
+    }
   }
 
   Future<List<Drink>> getFromDb() async {
@@ -160,19 +155,14 @@ class _MyHomePageState extends State<MyHomePage> {
         child: new Scaffold(
           drawer: new MyDrawer(this._scaffoldContext),
           appBar: new AppBar(
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
+
             title: new Text(widget.title),
             actions: <Widget>[
               new IconButton(
-                  icon: new Icon(Icons.cloud_download), onPressed: import),
-              new IconButton(
-                  icon: new Icon(Icons.cloud_upload), onPressed: exportData),
+                  icon: new Icon(Icons.sync), onPressed: _synchronize),
             ],
           ),
           body: new Center(
-              // Center is a layout widget. It takes a single child and positions it
-              // in the middle of the parent.
               child: new FutureBuilder<List<Drink>>(
             future: getFromDb(),
             builder:

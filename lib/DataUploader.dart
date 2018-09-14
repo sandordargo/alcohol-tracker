@@ -8,118 +8,50 @@ import 'package:date_format/date_format.dart';
 import 'package:myapp/Drink.dart';
 import 'package:myapp/SignInContainer.dart';
 
-class UploadData extends StatefulWidget {
-  final List<Drink> data;
-
-  UploadData(this.data);
-
-  State createState() => new UploadDataState(this.data);
-}
-
-class UploadDataState extends State<UploadData> {
+class DataUploader {
   final List<Drink> data;
   GoogleSignInAccount _currentUser;
-  String _contactText = "";
   SignInContainer _signInContainer = new SignInContainer();
+  static bool  exporting = false;
+  final BuildContext _scaffoldContext;
 
-  UploadDataState(this.data);
-
-  @override
-  void initState() {
-    super.initState();
+  DataUploader(this.data, this._scaffoldContext) {
     _currentUser = _signInContainer.getCurrentUser();
-    _signInContainer.listen((account) {
-      _currentUser = _signInContainer.getCurrentUser();
-      if (this.mounted) {
-        setState(() {});
-      }
-    });
   }
 
-  Widget _buildBody() {
+  void upload() {
     if (_currentUser != null) {
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          getTitle(),
-          const Text("Signed in successfully."),
-          new Text(_contactText),
-          new RaisedButton(
-            child: const Text('UPLOAD AGAIN'),
-            onPressed: () {
-              Navigator.pop(context);
-              _exportData();
-            },
-          ),
-        ],
-      );
-    } else {
-      return new Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          const Text("You are not currently signed in."),
-          new RaisedButton(
-            child: const Text('SIGN IN'),
-            onPressed: _signInContainer.handleSignIn,
-          ),
-        ],
-      );
+      if (!DataUploader.exporting) {
+        DataUploader.exporting = true;
+        _exportData().then((status) {
+          DataUploader.exporting = false;
+          _showSnackbar(new Text(status == 200
+              ? 'Data upload finished successfully'
+              : "Data upload failed"));
+        });
+      }
+    }
+    else {
+      _showSnackbar(Text("Login please for synching"));
     }
   }
 
-  Widget getTitle() {
-    if (_currentUser == null) {
-      return new ListTile(
-        leading: getLead(),
-        title: new Text("Sign in"),
-        onTap: _signInContainer.handleSignIn,
-      );
-    }
-    return new ListTile(
-      leading: getLead(),
-      title: new Text(_currentUser.displayName),
-      subtitle: new Text(_currentUser.email),
-    );
+  void _showSnackbar(Text content) {
+    Scaffold.of(_scaffoldContext).showSnackBar(new SnackBar(content: content));
   }
 
-  Widget getLead() {
-    if (_currentUser == null) {
-      return new CircleAvatar(child: new Text("?"));
-    }
-    return new GoogleUserCircleAvatar(
-      identity: _currentUser,
-    );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: new AppBar(
-          title: const Text('Google Sign In'),
-        ),
-        body: new ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: _buildBody(),
-        ));
-  }
-
-  Future<Null> _exportData() async {
+  Future<int> _exportData() async {
     if (await _signInContainer.isSignedIn() == false) {
-      print("cannot upload, sign out");
-      return;
-    }
-    if (this.mounted) {
-      setState(() {
-        _contactText = "Uploading data to your Google Drive...";
-      });
+      _showSnackbar(Text("Login please for synching"));
+      return 403;
     }
 
     var fileId = await getFileId();
-
     if (fileId == null) {
       fileId = await _createFile();
     }
-    _upload(fileId);
+    return _upload(fileId);
   }
 
   Future<String> _createFile() async {
@@ -135,10 +67,7 @@ class UploadDataState extends State<UploadData> {
         body: mybody);
 
     if (response.statusCode != 200) {
-      setState(() {
-        _contactText = "Drive API gave a ${response.statusCode} "
-            "response. Check logs for details.";
-      });
+      _showSnackbar(Text("Data upload failed"));
       return null;
     }
 
@@ -188,15 +117,16 @@ class UploadDataState extends State<UploadData> {
     return fileData != null ? fileData["id"] : null;
   }
 
-  void _upload(String fileId) async {
+  Future<int> _upload(String fileId) async {
     if (fileId == null) {
-      return;
+      _showSnackbar(Text("Upload failed"));
+      return 500;
     }
     final http.Response response = await http.patch(
         'https://www.googleapis.com/upload/drive/v3/files/$fileId?uploadType=media',
         headers: await _signInContainer.getCurrentUser().authHeaders,
         body: getDataToUpload());
-    print(response.statusCode);
-    print(response.body);
+    print("upload status ${response.statusCode}");
+    return response.statusCode;
   }
 }

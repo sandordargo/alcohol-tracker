@@ -3,13 +3,14 @@ import 'package:myapp/UpsertConsumption.dart';
 import 'package:myapp/DrinkDatabase.dart';
 import 'package:myapp/Drink.dart';
 import 'package:myapp/Stats.dart';
-import 'package:myapp/ImportV2.dart';
 import 'package:myapp/MyDrawer.dart';
 import 'dart:async';
-import 'package:myapp/UploadData.dart';
 import 'package:myapp/MainStats.dart';
 import 'package:date_format/date_format.dart';
 import 'package:myapp/prefs.dart';
+import 'package:myapp/DataImporter.dart';
+import 'package:myapp/DataUploader.dart';
+
 
 class AllDrinksList extends StatefulWidget {
   AllDrinksList();
@@ -50,19 +51,15 @@ class _AllDrinksListState extends State<AllDrinksList> {
     );
   }
 
-  void import() {
-    Navigator.push(
-      context,
-      new MaterialPageRoute(
-          builder: (context) => new ImportV2(_scaffoldContext)),
-    );
-  }
-
-  void exportData() {
-    Navigator.push(
-      context,
-      new MaterialPageRoute(builder: (context) => new UploadData(data)),
-    );
+  void _synchronize() async {
+    List<Drink> drinks = await DrinkDatabase.get().getAllDrinks();
+    if (data.isEmpty && drinks.isEmpty) {
+      var importer = new DataImporter(_scaffoldContext);
+      importer.import();
+    } else {
+      var uploader = DataUploader(drinks, _scaffoldContext);
+      uploader.upload();
+    }
   }
 
   void stats() {
@@ -151,9 +148,7 @@ class _AllDrinksListState extends State<AllDrinksList> {
             title: new Text("All The Drinks"),
             actions: <Widget>[
               new IconButton(
-                  icon: new Icon(Icons.cloud_download), onPressed: import),
-              new IconButton(
-                  icon: new Icon(Icons.cloud_upload), onPressed: exportData),
+                  icon: new Icon(Icons.sync), onPressed: _synchronize),
             ],
           ),
           body: new Center(

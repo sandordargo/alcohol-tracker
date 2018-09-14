@@ -1,4 +1,4 @@
-# myapp
+# BoozeTracker
 
 A new Flutter application.
 
@@ -12,18 +12,27 @@ For help getting started with Flutter, view our online
 * Rename and add Icon
 * Add to my portfolio
 * Write a post about it
-* Redesign import page
-* Redesign export page
-* Remove current user?
+* Robust synchro
+    * Sign in at startup time
+    * If you don't sign in, gray sync button
+    * Undo snackbar
+    * Add an synced column?
 * imperial/metric unit settings
+* Remove current user?
 * Prefill based on name
 * Store type of drink
 * profile settings (WHO, Institute.., )
-* Robust synchro
+
 
 
 
 ## DONE
+* Robust synchro
+    * At sync
+        * if local is empty, import everything
+        * otherwise override what is in spreadsheet
+    * Add Sync button
+    * Remove export/import
 * Add detailed stats
 * Use weekly Limit and sober days settings in all drinks too
 * add settings page: weekly limit, days without alcohol
