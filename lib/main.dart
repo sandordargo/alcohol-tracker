@@ -37,7 +37,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => new _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   BuildContext _scaffoldContext;
   List<Drink> data;
   double _weeklyLimit;
@@ -47,10 +47,21 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     setWeeklyLimit();
     setWeeklySoberDaysLimit();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {});
+  }
 
   void setWeeklyLimit() async {
     this._weeklyLimit = await Prefs.getDoubleF("weeklyLimit");
