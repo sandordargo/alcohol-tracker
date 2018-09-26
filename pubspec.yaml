@@ -22,6 +22,16 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_launcher_icons: "^0.6.1"
+
+
+flutter_icons:
+  android: true
+  ios: "BoozeTracker-Icon"
+  image_path: "assets/icon/icons8-wine-glass-24-70.png"
+#  adaptive_icon_background: "#E9EB6E"
+#  adaptive_icon_foreground: "assets/icon/foreground-icons8-wine-glass-96.png"
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
