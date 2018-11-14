@@ -3,15 +3,17 @@ import 'package:myapp/DrinkDatabase.dart';
 import 'package:myapp/Drink.dart';
 import 'dart:async';
 import 'package:date_format/date_format.dart';
+import 'package:myapp/prefs.dart';
 
 class UpsertConsumption extends StatefulWidget {
   final Drink drink;
+  final BuildContext _scaffoldContext;
 
-  UpsertConsumption({this.drink});
+  UpsertConsumption(this._scaffoldContext, {this.drink});
 
   @override
   _UpsertConsumptionState createState() =>
-      new _UpsertConsumptionState(drink: this.drink);
+      new _UpsertConsumptionState(_scaffoldContext, drink: this.drink);
 }
 
 // add margins to suffixes
@@ -32,8 +34,9 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
   Text consumedUnitsText;
   double consumedUnits;
   final _formKey = GlobalKey<FormState>();
+  final BuildContext _scaffoldContext;
 
-  _UpsertConsumptionState({this.drink}) {
+  _UpsertConsumptionState(this._scaffoldContext, {this.drink}) {
     titleController =
         new TextEditingController(text: drink == null ? null : drink.name);
     volumeController = new TextEditingController(
@@ -45,13 +48,18 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
     selectedDay = drink == null
         ? _getTodayAtMindnight()
         : new DateTime.fromMillisecondsSinceEpoch(drink.consumptionDate);
-    selectedDayText = new Text("You had this drink on (${formatDate(selectedDay,
-        [yyyy, '-', mm, '-', dd])})");
+    selectedDayText = new Text(
+        "You had this drink on (${formatDate(selectedDay, [
+      yyyy,
+      '-',
+      mm,
+      '-',
+      dd
+    ])})");
     consumedUnits =
         drink == null ? 0.0 : drink.volume * (drink.strength / 100) * (8 / 100);
-    consumedUnitsText =
-        new Text("That's a drink of ${consumedUnits.toStringAsPrecision(
-            2)} units of alcohol.");
+    consumedUnitsText = new Text(
+        "That's a drink of ${consumedUnits.toStringAsPrecision(2)} units of alcohol.");
   }
 
   DateTime _getTodayAtMindnight() {
@@ -72,14 +80,12 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
     strengthController.removeListener(_updateConsumedUnits);
   }
 
-
   void _updateConsumedUnits() {
     consumedUnits = int.parse(volumeController.text) *
         (double.parse(strengthController.text) / 100) *
         (8 / 100);
     consumedUnitsText = new Text(
-        "That's a drink of ${consumedUnits.toStringAsPrecision(
-            2)} units of alcohol.");
+        "That's a drink of ${consumedUnits.toStringAsPrecision(2)} units of alcohol.");
   }
 
   Future<Null> _selectDate(BuildContext context) async {
@@ -93,9 +99,14 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
       print('Date selected: ${selectedDay.toString()}');
       setState(() {
         selectedDay = picked;
-        selectedDayText =
-            new Text("You had this drink on ${formatDate(selectedDay,
-            [yyyy, '-', mm, '-', dd])}.");
+        selectedDayText = new Text(
+            "You had this drink on ${formatDate(selectedDay, [
+          yyyy,
+          '-',
+          mm,
+          '-',
+          dd
+        ])}.");
       });
     }
   }
@@ -213,19 +224,17 @@ class _UpsertConsumptionState extends State<UpsertConsumption> {
                                   selectedDay.millisecondsSinceEpoch,
                               remark: remarkController.text);
                           db.upsertDrink(consumption);
-
-                          return showDialog(
-                            context: context,
-                            builder: (context) {
-                              return new AlertDialog(
-                                // Retrieve the text the user has typed in using our
-                                // TextEditingController
-                                content:
-                                    new Text("You consumed, ${titleController
-                                        .text}"),
-                              );
-                            },
+                          Prefs.setBool("sync_needed", true);
+                          Scaffold.of(_scaffoldContext).setState(
+                              () {
+                                print("Adding new drink");
+                              }
                           );
+                          Scaffold.of(_scaffoldContext).showSnackBar(SnackBar(
+                              content: new Text(
+                                  "You consumed ${consumedUnits.toStringAsPrecision(2)}"
+                                  " units of alcohol  "
+                                  "in the form of ${titleController.text}")));
                         },
                         child: new Text('Save',
                             style: new TextStyle(color: Colors.white)),

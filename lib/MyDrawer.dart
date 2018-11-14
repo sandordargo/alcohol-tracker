@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/Stats.dart';
-import 'package:myapp/ListAllDrinks.dart';
-import 'package:myapp/main.dart';
+import 'package:myapp/ListDrinks.dart';
 import 'package:myapp/HyperLinkTextSpan.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:myapp/SignInContainer.dart';
 import 'package:myapp/Settings.dart';
 
 class MyDrawer extends StatefulWidget {
-  final BuildContext _scaffoldContext;
-
-  MyDrawer(this._scaffoldContext);
+  MyDrawer();
 
   @override
-  _MyDrawerState createState() => new _MyDrawerState(_scaffoldContext);
+  _MyDrawerState createState() => new _MyDrawerState();
 }
 
 class _MyDrawerState extends State<MyDrawer> {
-  final BuildContext _scaffoldContext;
   SignInContainer _signInContainer = new SignInContainer();
 
-  _MyDrawerState(this._scaffoldContext);
+  _MyDrawerState();
 
   @override
   void initState() {
@@ -52,7 +48,7 @@ class _MyDrawerState extends State<MyDrawer> {
             Navigator.push(
                 ctxt,
                 new MaterialPageRoute(
-                    builder: (ctxt) => new MyHomePage(title: "Last 30 days")));
+                    builder: (ctxt) => new ListDrinks(title: "Last 30 days")));
           },
         ),
         new ListTile(
@@ -60,7 +56,7 @@ class _MyDrawerState extends State<MyDrawer> {
           onTap: () {
             Navigator.pop(ctxt);
             Navigator.push(ctxt,
-                new MaterialPageRoute(builder: (ctxt) => new AllDrinksList()));
+                new MaterialPageRoute(builder: (ctxt) => new ListDrinks(title: "All The Drinks", fetchAll: true)));
           },
         ),
         new ListTile(

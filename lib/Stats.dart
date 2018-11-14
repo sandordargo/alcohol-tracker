@@ -22,7 +22,6 @@ class Stats extends StatefulWidget {
 }
 
 class _StatsState extends State<Stats> {
-  BuildContext _scaffoldContext;
   double _weeklyLimit;
   int _weeklySoberDaysLimit;
   Prefs prefs;
@@ -185,7 +184,7 @@ class _StatsState extends State<Stats> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      drawer: new MyDrawer(_scaffoldContext),
+      drawer: new MyDrawer(),
       appBar: new AppBar(
         title: new Text("Statistics"),
         actions: <Widget>[
@@ -196,7 +195,6 @@ class _StatsState extends State<Stats> {
           child: new FutureBuilder<List<Drink>>(
         future: _fetchDrinks(),
         builder: (BuildContext context, AsyncSnapshot<List<Drink>> snapshot) {
-          _scaffoldContext = context;
           _setWeeklyLimit();
           _setWeeklySoberDaysLimit();
           switch (snapshot.connectionState) {

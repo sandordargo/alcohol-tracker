@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:date_format/date_format.dart';
 import 'package:myapp/Drink.dart';
 import 'package:myapp/SignInContainer.dart';
+import 'package:myapp/prefs.dart';
 
 class DataUploader {
   final List<Drink> data;
@@ -20,6 +21,8 @@ class DataUploader {
     if (_signInContainer.getCurrentUser() != null) {
       if (!DataUploader.exporting) {
         DataUploader.exporting = true;
+        Prefs.setBool("sync_needed", false);
+        Prefs.setInt("last_sync", DateTime.now().millisecondsSinceEpoch);
         _exportData().then((status) {
           DataUploader.exporting = false;
           _showSnackbar(new Text(status == 200
@@ -48,6 +51,7 @@ class DataUploader {
     if (fileId == null) {
       fileId = await _createFile();
     }
+
     return _upload(fileId);
   }
 
