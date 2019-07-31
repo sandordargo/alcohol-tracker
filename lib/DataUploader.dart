@@ -32,7 +32,7 @@ class DataUploader {
       }
     }
     else {
-      _showSnackbar(Text("Login please for synching"));
+      _showSnackbar(Text("Login please for synching (NULL user)"));
     }
   }
 
@@ -43,7 +43,7 @@ class DataUploader {
 
   Future<int> _exportData() async {
     if (await _signInContainer.isSignedIn() == false) {
-      _showSnackbar(Text("Login please for synching"));
+      _showSnackbar(Text("Login please for synching (not signed in)"));
       return 403;
     }
 
